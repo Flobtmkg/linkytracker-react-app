@@ -1,7 +1,7 @@
 {
-  "name": "testproject",
+  "name": "linkytracker",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
+  "main": "./src/Entrypoint.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -9,13 +9,21 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/webpack-config": "~19.0.0",
+    "@nivo/core": "~0.83.0",
+    "@nivo/line": "~0.83.0",
+    "bootstrap": "^5.3.1",
     "expo": "~49.0.7",
     "expo-status-bar": "~1.6.0",
     "react": "18.2.0",
-    "react-native": "0.72.3"
+    "react-calendar": "~4.7.0",
+    "react-dom": "18.2.0",
+    "react-native": "0.72.6",
+    "react-native-web": "~0.19.6",
+    "react-select": "~5.8.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "~7.20.0"
   },
   "private": true
 }

@@ -1,0 +1,41 @@
+.bigBlock {
+    max-width:1500px;
+    background-color: RGBA(255,255,255,0.03);
+}
+
+.buttonRoundContainer {
+    width: 32px;
+    height: 32px;
+    border-radius: 100%;
+    cursor: pointer;
+    margin-left: 3%;
+    background-color: RGBA(255,255,255,0.3);
+    padding-top: 8px;
+    box-shadow: 2px 4px 12px rgba(255,255,255,.1);
+    transition: all .3s cubic-bezier(0,0,.5,1);
+}
+
+.buttonRoundContainer:hover, .textMenu:hover {
+    box-shadow: 2px 4px 12px rgba(255,255,255,0.2)!important;
+    text-shadow: 2px 4px 12px rgba(255,255,255,0.6)!important;
+}
+
+.centerLogoImage {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hide {
+    display: none!important;
+}
+.show {
+    display: block!important;
+}
+
+.textMenu {
+    margin-left: 40px;
+    margin-top: -21px;
+    text-shadow: 2px 4px 12px rgba(255,255,255,.3)!important;
+    transition: all .3s cubic-bezier(0,0,.5,1);
+}

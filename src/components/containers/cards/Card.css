@@ -1,0 +1,16 @@
+.cardBox {
+    background-color: RGBA(255,255,255,0.2)!important;
+    padding: 15px;
+    margin: 10px;
+}
+
+.centerHoriz {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.calandarMods {
+    background: RGBA(255,255,255,0.75)!important;
+    width: 100%!important;
+}
