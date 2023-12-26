@@ -9,3 +9,7 @@ install react web dependencies :
 Start web :
 
 	npm run web
+
+build react web :
+
+	npx expo export:web
