@@ -10,6 +10,10 @@ Start web :
 
 	npm run web
 
-build react web :
+Customize webpack bundle :
+
+	npx expo customize webpack.config.js
+
+build react web bundle :
 
 	npx expo export:web
