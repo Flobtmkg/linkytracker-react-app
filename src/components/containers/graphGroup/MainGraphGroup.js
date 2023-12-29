@@ -3,6 +3,7 @@ import { MainInfoCard } from '../cards/MainInfoCard';
 import { CalendarParamSelectCard } from '../cards/CalendarParamSelectCard';
 import { LineGraphContainer } from '../graphContainers/LineGraphContainer';
 import {dateTransform} from "../../../utilities/DateUtil";
+import {getBackendAddress} from "../../../utilities/EnvUtil";
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Container.css'
@@ -11,7 +12,7 @@ import './Container.css'
 export default function MainGraphGroup() {
 
     const [targetDate, setTargetDate] = useState(dateTransform(new Date()));
-    const [serverBaseURL, setserverBaseURL] = useState("http://localhost:8080");
+    const [serverBaseURL, setserverBaseURL] = useState(getBackendAddress());
     const [api, setApi] = useState("/api/v1/datapoints/date");
     const [deviceId, setDeviceId] = useState("");
 

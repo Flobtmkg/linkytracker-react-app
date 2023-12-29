@@ -10,6 +10,7 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate}) {
   const fetchRecentActivity = () => {
     fetch(serverBaseURL + deviceRecentActivityApi + "?" + "deviceId=" + deviceId)
       .then(response => {return response.text()})
+      .then(data => data !== "false" && data !== "true" ? "---" : data)
       .then(data => {setRecentActivite(data)})
       .catch(error => console.error('Error fetching data from device recent activity Api :', error));
   }

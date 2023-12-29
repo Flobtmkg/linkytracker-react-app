@@ -17,3 +17,20 @@ Customize webpack bundle (override system over default webpack export generated 
 build react web bundle :
 
 	npx expo export:web
+
+since the react app is bundled we can build the docker image :
+
+	docker build -t linky-react-app:latest .
+
+To launch container (on port 81 here) :
+
+	docker run --name linky-react-app -p 81:80 linky-react-app:latest
+
+To launch container (on port 81 overriding backend adress to http://localhost:8888) :
+
+	docker run --name linky-react-app -p 81:80 -e LINKY_SERVER_PORT=8888 linky-react-app:latest
+
+Environment variables :
+	ENV LINKY_SERVER_HOST="localhost"
+	ENV LINKY_SERVER_PROTOCOLE="http"
+	ENV LINKY_SERVER_PORT="8080"
