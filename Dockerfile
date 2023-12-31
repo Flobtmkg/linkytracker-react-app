@@ -9,5 +9,8 @@ COPY ./web-build/ /usr/local/apache2/htdocs/
 COPY ./docker-container-launcher.sh  /usr/local/apache2/
 
 RUN ["chmod", "+x", "/usr/local/apache2/docker-container-launcher.sh"]
+RUN ["apt-get", "-y", "update"]
+RUN ["apt-get", "-y", "install", "curl"]
+RUN ["apt-get", "-y", "install", "iputils-ping"]
 
 CMD ["/bin/sh", "/usr/local/apache2/docker-container-launcher.sh"]
