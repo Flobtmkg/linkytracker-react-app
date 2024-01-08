@@ -1,6 +1,6 @@
 {
   "name": "linkytracker",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "main": "./src/Entrypoint.js",
   "scripts": {
     "start": "expo start",
