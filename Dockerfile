@@ -10,4 +10,4 @@ COPY ./web-build/ /usr/share/nginx/html
 RUN ["apk", "add", "--update", "curl"]
 RUN ["apk", "add", "--update", "iputils"]
 
-CMD echo "launching..." ; printf "const LINKY_SERVER_HOST=\"%s\";\n" ${LINKY_SERVER_HOST} >> /usr/share/nginx/html/static/js/env.js ; printf "const LINKY_SERVER_PROTOCOLE=\"%s\";\n" ${LINKY_SERVER_PROTOCOLE} >> /usr/share/nginx/html/static/js/env.js ; printf "const LINKY_SERVER_PORT=\"%s\";\n" ${LINKY_SERVER_PORT} >> /usr/share/nginx/html/static/js/env.js ; nginx -g "daemon off;"
+CMD echo "launching..." ; rm -f /usr/share/nginx/html/static/js/env.js ; printf "const LINKY_SERVER_HOST=\"%s\";\n" ${LINKY_SERVER_HOST} >> /usr/share/nginx/html/static/js/env.js ; printf "const LINKY_SERVER_PROTOCOLE=\"%s\";\n" ${LINKY_SERVER_PROTOCOLE} >> /usr/share/nginx/html/static/js/env.js ; printf "const LINKY_SERVER_PORT=\"%s\";\n" ${LINKY_SERVER_PORT} >> /usr/share/nginx/html/static/js/env.js ; nginx -g "daemon off;"
