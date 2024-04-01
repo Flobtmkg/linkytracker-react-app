@@ -4,3 +4,13 @@
 .toolTipBox {
     padding:10px!important;
 }
+.lastReadingsText {
+    text-align: right;
+    margin-right: 110px;
+}
+.hide {
+    display: none!important;
+}
+.show {
+    display: block!important;
+}

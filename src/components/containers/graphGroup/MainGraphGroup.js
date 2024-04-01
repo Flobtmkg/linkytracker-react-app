@@ -41,7 +41,7 @@ export default function MainGraphGroup() {
                     </div>
                 </div>
             </div>
-            <LineGraphContainer serverBaseURL={serverBaseURL} api={api} deviceId={deviceId} targetDate={targetDate} />
+            <LineGraphContainer serverBaseURL={serverBaseURL} api={api} deviceId={deviceId} targetDate={targetDate} isMenuDisplayed={displayMenu}/>
         </div>
     );
 };

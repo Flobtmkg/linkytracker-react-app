@@ -3,6 +3,16 @@ import { ResponsiveLine } from '@nivo/line'
 import React, { useState, useEffect } from 'react';
 import './LineGraphContainer.css'
 
+
+// number format relative to locale
+const nbrFormat = new Intl.NumberFormat();
+
+// watt calculation coefficient from kw/h/m to watt
+const WATT_BASE = 60000;
+// If we show the last reading text
+let showLastReadings = false;
+let lastWattage = 0;
+
 // graph data Map storage
 let dataGraphMapCache = new Map();
 
@@ -16,13 +26,14 @@ const CustomTooltip = ({point}) => {
         <div style = {{
            position: 'absolute!important',
            left: isFirstHalf ? 150 : -150}} className='toolTipBox card cardBox text-bg-dark' >
+            <div><b>Average wattage : </b>{nbrFormat.format((point.data.y * WATT_BASE).toFixed(2))} W</div>
             <div><b>{point.serieId} : </b>{point.data.y}</div>
             <div><b>Time : </b>{point.data.x}</div>
         </div>
       );
   };
 
-export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate }) {
+export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, isMenuDisplayed }) {
 
     // Hook definiton a call to setDataGraph trigger the re-render
     // dataGraph is an array of graph series
@@ -44,6 +55,8 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate })
         eventSourceConfig(path + params);
     }, [serverBaseURL, api, deviceId, targetDate]);
 
+    // Show last readings when menu is not displayed
+    showLastReadings = !isMenuDisplayed;
 
     // Configure a fresh new eventSource with new API path target
     function eventSourceConfig(fullPath){
@@ -76,6 +89,9 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate })
             color : "hsl(208, 70%, 50%)",
             data : Array.from(dataGraphMapCache.values())
         }
+        // Storing last wattage value
+        lastWattage = nbrFormat.format((Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).y * WATT_BASE).toFixed(2));
+       
         // Applying tmpSerieObjectGraph as an array with one value because we only manage one curve by now
         setDataGraph([tmpSerieObjectGraph]);
     }
@@ -89,6 +105,9 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate })
 
     return (
         <div className="lineGraphBox">
+            <div  className={showLastReadings == true ? "show" : "hide"} >
+                <h5 className="lastReadingsText text-white">Last average wattage reading : <b>{lastWattage} W</b></h5>
+            </div>
             <ResponsiveLine
                 data={dataGraph}
                 margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
