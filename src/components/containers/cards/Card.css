@@ -10,7 +10,63 @@
     margin-right: auto;
 }
 
+.summaryContentText{
+    margin-bottom: 2px;
+}
+
 .calandarMods {
     background: RGBA(255,255,255,0.75)!important;
     width: 100%!important;
+}
+
+.sliderwrapper {
+    display: flex;
+    margin-top: 25px;
+}
+
+.sliderAdjust {
+    padding-top: 2px!important;
+    margin-left: 10px!important;
+}
+
+.hackTextAndSlider{
+    display: ruby;
+}
+
+.lockWindowAlignedRight{
+    margin-right: 0!important;
+    margin-left: auto!important;
+}
+
+.alignedTextRight{
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.flexContainer{
+    display: flex;
+}
+
+.lockedTimeWindowLabel{
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.infoWindowSlide{
+    padding-top:11px;
+}
+
+.serverControls{
+    align-self: center;
+    font-size: 1.25rem!important;
+    font-weight: 500!important;
+}
+
+.sliderStartTime{
+    margin-top: 30px!important;
+}
+
+.hourLabel{
+    height:12px;
+    font-size: 0.8rem;
 }

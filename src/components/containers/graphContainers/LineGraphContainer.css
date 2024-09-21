@@ -1,16 +1,58 @@
 .lineGraphBox {
-    height: 700px;
+    height: 760px;
 }
 .toolTipBox {
     padding:10px!important;
 }
+.cardBoxOpacity0 {
+    padding: 15px;
+    margin: 10px;
+    opacity: 1!important;
+}
 .lastReadingsText {
     text-align: right;
     margin-right: 110px;
+}
+.totalUsageText {
+    margin-top: -32px;
+    text-align: center;
+}
+.lastReadingsTextAdjustment {
+    margin-top: -29px;
 }
 .hide {
     display: none!important;
 }
 .show {
     display: block!important;
+}
+.smallText{
+    font-size: 0.75rem!important;
+}
+.graphTimeFooterContainer{
+    display: flex;
+}
+.rightFooter{
+    font-size: 0.7rem!important;
+    margin-right: 110px;
+    margin-top: -45px;
+    margin-left: auto;
+    color:rgba(255,255,255, 0.60);
+}
+.leftFooter{
+    font-size: 0.7rem!important;
+    margin-left: 65px;
+    margin-top: -45px;
+    color:rgba(255,255,255, 0.60);
+}
+/* override nivo crosshair dash line color using CSS selectors */
+g > line[fill="none"]{
+    stroke: rgb(255,0,0) !important;
+    stroke-opacity: 1 !important;
+    stroke-width: 2 !important;
+}
+
+/* override nivo labels color using CSS selectors */
+text {
+    fill: rgba(255,255,255, 0.60)!important;
 }
