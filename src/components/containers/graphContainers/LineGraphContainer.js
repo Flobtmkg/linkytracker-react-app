@@ -59,9 +59,11 @@ const customTooltip = ({point}) => {
 
 export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, windowLocked, startTimeWindowValue, isMenuDisplayed, windowSizeValue}) {
 
-    // Hook definiton a call to setDataGraph trigger the re-render
+    // A call to setDataGraph trigger the re-render
     // dataGraph is an array of graph series
     const [dataGraph, setDataGraph] = useState([]);
+
+    const [dataRecieved, setDataRecieved] = useState([0]);
 
     const [arrayWindowLimit, setArrayWindowLimit] = useState(["",""]);
     
@@ -85,6 +87,13 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
         populateGraph();
     }, [windowLocked, startTimeWindowValue, windowSizeValue]);
 
+    // We cannot call populateGraph() from eventsource context because the states are not up to date
+    // We need to update the graph throw a hook, so it gets all the state right when React managed the hook queue.
+    // So the eventsource onMessage changes the "dataRecieved" state and this useEffect gets triggered and call populateGraph().
+    useEffect(() => {
+        populateGraph();
+    }, [dataRecieved]);
+
     // Show last readings when menu is not displayed
     showLastReadings = !isMenuDisplayed;
 
@@ -98,7 +107,7 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
             // Add to the Map of datas if necessary
             if(!dataGraphMapCache.has(dataPointMessageObject.x)){
                 dataGraphMapCache.set(dataPointMessageObject.x, dataPointMessageObject);
-                populateGraph();
+                setDataRecieved(Math.random());
             }
         }
     }

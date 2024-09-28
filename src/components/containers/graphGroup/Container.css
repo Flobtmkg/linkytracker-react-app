@@ -15,7 +15,13 @@
     transition: all .3s cubic-bezier(0,0,.5,1);
 }
 
-.buttonRoundContainer:hover, .textMenu:hover {
+.buttonPointer {
+    cursor: pointer!important;
+    z-index: 10;
+    position:sticky;
+}
+
+.buttonPointer:hover, .textMenu:hover {
     box-shadow: 2px 4px 12px rgba(255,255,255,0.2)!important;
     text-shadow: 2px 4px 12px rgba(255,255,255,0.6)!important;
 }

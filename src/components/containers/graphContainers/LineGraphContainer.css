@@ -12,6 +12,7 @@
 .lastReadingsText {
     text-align: right;
     margin-right: 110px;
+    z-index: -1;
 }
 .totalUsageText {
     margin-top: -32px;
