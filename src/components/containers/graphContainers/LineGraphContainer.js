@@ -15,6 +15,10 @@ const HOUR_PROJ = 1000;
 const DAY_PROJ = 41.666666;
 // Watt to year kwh projection
 const YEAR_PROJ = 8.76;
+// Milliseconds per min
+const MIN_TO_MILLIS = 60000;
+// Milliseconds per hour
+const HOUR_TO_MILLIS = 3600000;
 
 // number format relative to locale
 const nbrFormat = new Intl.NumberFormat();
@@ -39,13 +43,13 @@ let eventSource = new EventSource("");
 
 // Custom graph toolTip
 const customTooltip = ({point}) => {
-    const isFirstHalf = point.index < (dataGraphMapCache.size / 2);
+    const isFirstHalf = point.x < (window.innerWidth / 2);
     return (
         <div style = {{
            position: 'absolute!important',
            left: isFirstHalf ? 150 : -150}} className='toolTipBox card cardBoxOpacity0 text-bg-dark' >
             <div><b>Average power : </b>{nbrFormat.format((point.data.y).toFixed(2))} Watt</div>
-            <div><b>Time : </b>{point.data.x == ("" || null || undefined) ? " -" : point.data.x}</div>
+            <div><b>Time : </b>{point.data.x == ("" || null || undefined) ? " -" : dateUtil.millisTimestampToFormatedDateTransform(point.data.x)}</div>
             <div className="smallText">
                 <p></p>
                 <div><b>Hour usage projection : </b>{nbrFormat.format((point.data.y/HOUR_PROJ).toFixed(3))} kwh</div>
@@ -57,7 +61,7 @@ const customTooltip = ({point}) => {
 };
 
 
-export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, windowLocked, startTimeWindowValue, isMenuDisplayed, windowSizeValue}) {
+export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, windowLocked, startTimeWindowValue, isMenuDisplayed, windowSizeValue, linearMode, offsetTimeZone}) {
 
     // A call to setDataGraph trigger the re-render
     // dataGraph is an array of graph series
@@ -81,7 +85,7 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
         emptyCacheData();
         populateGraph();
         eventSourceConfig(path + params);
-    }, [serverBaseURL, api, deviceId, targetDate]);
+    }, [serverBaseURL, api, deviceId, targetDate, offsetTimeZone]);
 
     useEffect(() => {
         populateGraph();
@@ -103,7 +107,9 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
         eventSource.onerror = (event) => console.log('error', event);
         // When SSE data is recieved...
         eventSource.onmessage = (event) => {
-            const dataPointMessageObject = JSON.parse(event.data);
+            var dataPointMessageObject = JSON.parse(event.data);
+            // Calculate timeZone compensation
+            dataPointMessageObject.x = dataPointMessageObject.x + (offsetTimeZone * HOUR_TO_MILLIS);
             // Add to the Map of datas if necessary
             if(!dataGraphMapCache.has(dataPointMessageObject.x)){
                 dataGraphMapCache.set(dataPointMessageObject.x, dataPointMessageObject);
@@ -125,21 +131,19 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
 
         const dataArray = Array.from(dataGraphMapCache.values());
         let displayArray = [];
-        displayArray[0] = {x:null,y:0};
 
         const selectedDate = dateUtil.inverseDateTransform(targetDate);
-        // There is always at least one value of {x:null,y:0}
+
         if(dataArray.length > 1){
             if(windowLocked){
                 let timeReached = false;
                 let indexReached = 0;
 
                 // As it is sorted by chronological order if we reach the condition all other elements are ok
-                const startOfWindowDate = subMinutes(parse(dataArray[dataArray.length - 1].x, dateUtil.getDTODateFormat(), selectedDate), windowSizeValue);
+                const startOfWindowTimestamp = dataArray[dataArray.length - 1].x - (windowSizeValue * MIN_TO_MILLIS);
                 for ( let i=0 ; timeReached==false && i < dataArray.length ; i++){
                     if(null != dataArray[i].x){
-                        const arrayCurrentDate = parse(dataArray[i].x, dateUtil.getDTODateFormat(), selectedDate);
-                        if(isAfter(arrayCurrentDate, startOfWindowDate)){
+                        if(isAfter(dataArray[i].x, startOfWindowTimestamp)){
                             // last values regarding window time
                             timeReached = true;
                             indexReached = i;
@@ -153,16 +157,14 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
 
                 // If a time window is provided
                 // As it is sorted by chronological order if we reach the condition all other elements are ok
-                const dateMinutesToMidnightStartWindow = dateUtil.midnightMinOffsetAndJSDateToCustomDatetimeTransform(startTimeWindowValue, selectedDate);
-                const startOfWindowDate = parse(dateMinutesToMidnightStartWindow, dateUtil.getDTODateFormat(), selectedDate);
-                const endOfWindowDate = addMinutes(parse(dateMinutesToMidnightStartWindow, dateUtil.getDTODateFormat(), selectedDate), windowSizeValue);
+                const startOfWindowTimestamp = dateUtil.midnightMinOffsetAndJSDateToMillisTimestampTransform(startTimeWindowValue, selectedDate);
+                const endOfWindowTimestamp = startOfWindowTimestamp + (windowSizeValue * MIN_TO_MILLIS)
                 // Return elements from the array
                 displayArray = dataArray.filter((value, index, array) => {
                     if(null == value.x){
                         return false;
                     }
-                    const arrayCurrentDate = parse(value.x, dateUtil.getDTODateFormat(), selectedDate);
-                    return isAfter(arrayCurrentDate, startOfWindowDate) && isBefore(arrayCurrentDate, endOfWindowDate);
+                    return isAfter(value.x, startOfWindowTimestamp) && isBefore(value.x, endOfWindowTimestamp);
                 });
             }
         }
@@ -173,13 +175,9 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
             setArrayWindowLimit(["",""])
         } else {
             windowElecUsage = displayArray.length/1000;
-            setArrayWindowLimit([null == displayArray[0].x ? displayArray[1].x : displayArray[0].x, displayArray[displayArray.length - 1].x]);
+            setArrayWindowLimit([null == displayArray[0].x ? dateUtil.millisTimestampToFormatedDateTransform(displayArray[1].x) : dateUtil.millisTimestampToFormatedDateTransform(displayArray[0].x), dateUtil.millisTimestampToFormatedDateTransform(displayArray[displayArray.length - 1].x)]);
         }
         
-        // Add the {null,0} point if necessary to normalize the graph
-        if(undefined == displayArray[0] || null != displayArray[0].x){
-            displayArray.unshift({x:null,y:0});
-        }
         return displayArray;
     }
 
@@ -191,7 +189,7 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
         const cachedlastTime = Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).x;
         lastValue = {
             wattage : nbrFormat.format((Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).y).toFixed(2)),
-            time : cachedlastTime == ("" || null || undefined) ? " -" : cachedlastTime
+            time : cachedlastTime == ("" || null || undefined) ? " -" : dateUtil.millisTimestampToFormatedDateTransform(cachedlastTime)
         };
 
         // create expected object for the ResponsiveLine graph
@@ -227,11 +225,14 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
                 enableArea={true}
                 areaOpacity={0.05}
                 xScale={{ 
-                    type: 'point'
+                    type: linearMode ? "linear" : "point",
+                    min: 'auto',
+                    max: 'auto',
+                    reverse: false
                 }}
                 yScale={{
                     type: 'linear',
-                    min: 'auto',
+                    min: '0',
                     max: 'auto',
                     stacked: true,
                     reverse: false

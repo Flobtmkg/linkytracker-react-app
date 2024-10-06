@@ -22,6 +22,8 @@ export default function MainGraphGroup() {
     const [windowLocked, setWindowLocked] = useState(true);
     const [startTimeWindowValue, setStartTimeWindowValue] = useState(getCurentTimeForDefaultValue());
     const [windowSizeValue, setWindowSizeValue] = useState(15);
+    const [linearMode, setLinearMode] = useState(true);
+    const [offsetTimeZone, setOffsetTimeZone] = useState(0);
   
     function handleClickDisplayMenu(){
         setdisplayMenu(!displayMenu);
@@ -48,7 +50,8 @@ export default function MainGraphGroup() {
                             serverBaseURL={serverBaseURL}
                             deviceId={deviceId}
                             targetDate={targetDate}
-                            setWindowSizeValue={setWindowSizeValue} />
+                            setWindowSizeValue={setWindowSizeValue}
+                            setOffsetTimeZone={setOffsetTimeZone} />
                     </div>
                     <div className="col">
                         <CalendarParamSelectCard 
@@ -58,7 +61,9 @@ export default function MainGraphGroup() {
                             startTimeWindowValue={startTimeWindowValue}
                             setStartTimeWindowValue={setStartTimeWindowValue}
                             windowSizeValue={windowSizeValue}
-                            setWindowSizeValue={setWindowSizeValue} />
+                            setWindowSizeValue={setWindowSizeValue}
+                            linearMode={linearMode}
+                            setLinearMode={setLinearMode} />
                     </div>
                 </div>
             </div>
@@ -70,7 +75,9 @@ export default function MainGraphGroup() {
                 windowLocked={windowLocked}
                 startTimeWindowValue={startTimeWindowValue}
                 isMenuDisplayed={displayMenu}
-                windowSizeValue={windowSizeValue}/>
+                windowSizeValue={windowSizeValue}
+                linearMode={linearMode}
+                offsetTimeZone={offsetTimeZone} />
         </div>
     );
 };

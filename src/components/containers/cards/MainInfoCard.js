@@ -9,7 +9,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 
 const goldScaleRatio = 3.66518;
 
-export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSizeValue}) {
+export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSizeValue, setOffsetTimeZone}) {
 
   const deviceRecentActivityApi = "/api/v1/device/recent/activity";
   const serverConfigApi = "/api/v1/config";
@@ -17,6 +17,7 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
   const [defaultWindowSize, setDefaultWindowSize] = useState(15);
   const [recentActivite, setRecentActivite] = useState("");
   const [offsetDataFilter, setoffsetDataFilter] = useState(0);
+  const [defaultOffsetTimeZone, setDefaultOffsetTimeZone] = useState(0);
   const [controlsLocked, setControlsLocked] = useState(true);
 
   function getScale(value) {
@@ -78,7 +79,7 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
   const fetchRecentActivity = () => {
     fetch(serverBaseURL + deviceRecentActivityApi + "?" + "deviceId=" + deviceId)
       .then(response => {return response.text()})
-      .then(data => data !== "false" && data !== "true" ? "---" : data)
+      .then(data => data !== "false" && data !== "true" ? "" : data)
       .then(data => {setRecentActivite(data)})
       .catch(error => console.error('Error fetching data from device recent activity Api :', error));
   }
@@ -90,6 +91,8 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
         setoffsetDataFilter(data.dataFilter);
         setDefaultWindowSize(data.defaultTimeWindow)
         setWindowSizeValue(data.defaultTimeWindow)
+        setOffsetTimeZone(data.defaultTimeZoneOffset)
+        setDefaultOffsetTimeZone(data.defaultTimeZoneOffset)
       })
       .catch(error => console.error('Error fetching data from server config Api :', error));
   }
@@ -103,6 +106,17 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
     fetch(serverBaseURL + serverConfigApi + pathOffsetFilter + value, requestOptions)
       .catch(error => console.error('Error posting data to server dataFilter Api :', error));
     setoffsetDataFilter(value);
+  }
+
+  const postDefaultOffsetTimeZoneConfig = (value) => {
+    const pathTimeZoneOffset = "/timeZoneOffset/";
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    fetch(serverBaseURL + serverConfigApi + pathTimeZoneOffset + value, requestOptions)
+      .catch(error => console.error('Error posting data to server timeZoneOffset Api :', error));
+      setDefaultOffsetTimeZone(value);
   }
 
   const postDefaultTimeWindowSizeValueConfig = (value) => {
@@ -125,21 +139,23 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
   return (
     <div>
       <div className="card cardBox text-bg-dark">
-        <h5 className="card-title text-center">Summary :</h5>
+        <h5 className="card-title text-center cardTitleMargin">Summary</h5>
         <p className="card-text summaryContentText"><b>Selected date : </b><small><i>{(targetDate != null && targetDate != "") ? targetDate : "---"}</i></small></p>
         <p className="card-text summaryContentText"><b>Selected device : </b><small><i>{(deviceId != null && deviceId != "") ? deviceId : "---"}</i></small></p>
         <p className="card-text summaryContentText"><b>Device active : </b>
           <small>
-            <i className={recentActivite === "false" ? "text-warning" : ""}>
-              {(recentActivite != null && recentActivite != "") ? recentActivite : "---"}
+            <i className={recentActivite === "false" ? "warning-text" : recentActivite != "" ? "ok-text" : ""}>
+              {(recentActivite != "") ? recentActivite : "---"}
             </i>
           </small>
         </p>
       </div>
       <div className="card cardBox text-bg-dark">
-        <FormControlLabel disableTypography={true} className="serverControls" control={<Checkbox icon={<LockOpenOutlinedIcon color="success" />} checkedIcon={<LockIcon color="warning" />} onChange={(event, checked) => setControlsLocked(checked)} checked={controlsLocked} />} label="Advanced server parameters :" />
-        <div className="sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Input offset filter (ms) : </b></p><IOSSlider onChangeCommitted={(event, value) => postOffsetFilterValueConfig(value)}  min={5} max={300} defaultValue={offsetDataFilter} valueLabelDisplay="on" disabled={controlsLocked} /></div>
-        <div className="sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Default window time size (min) : </b></p><IOSSlider scale={getScale} onChangeCommitted={(event, value) => postDefaultTimeWindowSizeValueConfig(getScale(value))}  min={1} max={1439} defaultValue={getInverseScale(defaultWindowSize)} valueLabelDisplay="on" disabled={controlsLocked} /></div>
+      <p className="alignedTextRight additionalLabel">* advanced parameters relative to UI requires a page reload</p>
+        <FormControlLabel disableTypography={true} className="serverControls cardTitleMargin" control={<Checkbox icon={<LockOpenOutlinedIcon color="success" />} checkedIcon={<LockIcon color="warning" />} onChange={(event, checked) => setControlsLocked(checked)} checked={controlsLocked} />} label="Advanced parameters *" />
+        <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Device input offset filter (ms) : </b></p><IOSSlider onChangeCommitted={(event, value) => postOffsetFilterValueConfig(value)}  min={5} max={300} defaultValue={offsetDataFilter} valueLabelDisplay="on" disabled={controlsLocked} /></div>
+        <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Default startup window size (min) : </b></p><IOSSlider scale={getScale} onChangeCommitted={(event, value) => postDefaultTimeWindowSizeValueConfig(getScale(value))}  min={1} max={1439} defaultValue={getInverseScale(defaultWindowSize)} valueLabelDisplay="on" disabled={controlsLocked} /></div>
+        <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Data time zone offset (hour) : </b></p><IOSSlider  min={-12} max={12} defaultValue={defaultOffsetTimeZone} onChangeCommitted={(event, value) => postDefaultOffsetTimeZoneConfig(value)} valueLabelDisplay="on" disabled={controlsLocked} /></div>
       </div>
     </div>
   );

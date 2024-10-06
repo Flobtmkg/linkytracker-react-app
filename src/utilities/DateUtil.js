@@ -4,6 +4,9 @@ const DTODateFormatRegex = /^([0-9]{2})h\s([0-9]{2})min\s([0-9]{2})s\s([0-9]{3})
 const DTODateFormat = "HH'h' mm'min' ss's' SSS'ms' '('yyyy-MM-dd')'";
 const classicalLocalDateFormatRegex = /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
 
+// Milliseconds per min
+const MIN_TO_MILLIS = 60000;
+
 export class DateUtil {
 
     DateUtil(){
@@ -31,20 +34,24 @@ export class DateUtil {
         return new Date(year, month - 1, day, 0, 0, 0, 0);
     }
 
-    // Minutes offset to midnight to "HH'h' mm'min' ss's' SSS'ms' '('yyyy-MM-dd')'" format
-    midnightMinOffsetAndJSDateToCustomDatetimeTransform(minutesOffset, jsBaseDate){
-        var strDate = this.dateTransform(jsBaseDate);
-        var hours = Math.trunc(minutesOffset / 60);
-        var minutes = minutesOffset - hours*60;
-        var dateString = ("0" + hours).slice(-2) + "h " + ("0" + minutes).slice(-2) + "min " + "00s 000ms" + " (" + strDate + ")"
-        return dateString;
+    // Minutes offset to midnight to epochMillis
+    midnightMinOffsetAndJSDateToMillisTimestampTransform(minutesOffset, jsBaseDate){
+        return jsBaseDate.getTime() + (minutesOffset * MIN_TO_MILLIS);
     }
 
     // Minutes offset to midnight to "HH'h' mm'min' format
     midnightMinOffsetAndJSDateToHourMinTransform(minutesOffset, jsBaseDate){
         var hours = Math.trunc(minutesOffset / 60);
         var minutes = minutesOffset - hours*60;
-        var dateString = ("0" + hours).slice(-2) + "h " + ("0" + minutes).slice(-2) + "min "
+        var dateString = ("0" + hours).slice(-2) + "h " + ("0" + minutes).slice(-2) + "min ";
+        return dateString;
+    }
+
+    // Transforms epochMillis to "HH'h' mm'min' ss's' SSS'ms' '('yyyy-MM-dd')'" format
+    millisTimestampToFormatedDateTransform(milisTimestamp){
+        const dateFromMilis = new Date(milisTimestamp);
+        var strDate = this.dateTransform(dateFromMilis);
+        var dateString = ("0" + dateFromMilis.getHours()).slice(-2) + "h " + ("0" + dateFromMilis.getMinutes()).slice(-2) + "min " + ("0" + dateFromMilis.getSeconds()).slice(-2) + "s " + ("00" + dateFromMilis.getMilliseconds()).slice(-3) + "ms" + " (" + strDate + ")";
         return dateString;
     }
 

@@ -4,6 +4,13 @@
     margin: 10px;
 }
 
+.warning-text{
+    color: RGB(237,108,2);
+}
+.ok-text{
+    color: RGB(101,196,102);
+}
+
 .centerHoriz {
     display: block;
     margin-left: auto;
@@ -15,13 +22,23 @@
 }
 
 .calandarMods {
-    background: RGBA(255,255,255,0.75)!important;
+    color:RGB(2,136,209);
     width: 100%!important;
+    border-radius: 10px;
+}
+button.react-calendar__tile--active{
+    background-color: RGB(101,196,102)!important;
+    border-radius: 100%;
+}
+button.react-calendar__tile--active:hover{
+    background-color: RGB(101,196,102)!important;
+}
+abbr[aria-label="Monday"], abbr[aria-label="Tuesday"], abbr[aria-label="Wednesday"], abbr[aria-label="Thursday"], abbr[aria-label="Friday"], abbr[aria-label="Saturday"], abbr[aria-label="Sunday"]{
+    font-weight: 800!important;
 }
 
 .sliderwrapper {
-    display: flex;
-    margin-top: 25px;
+    margin-bottom: 25px;
 }
 
 .sliderAdjust {
@@ -48,8 +65,9 @@
 }
 
 .lockedTimeWindowLabel{
-    font-size: 0.9rem;
+    font-size: 0.9rem!important;
     font-style: italic;
+    font-weight: 600!important;
 }
 
 .infoWindowSlide{
@@ -62,11 +80,26 @@
     font-weight: 500!important;
 }
 
+.linearModeToggle{
+    margin-left: 10px!important;
+    margin-top: -10px!important;
+}
+
 .sliderStartTime{
-    margin-top: 30px!important;
+    margin-top: 15px!important;
 }
 
 .hourLabel{
     height:12px;
     font-size: 0.8rem;
+    margin-top: -10px;
+}
+
+.additionalLabel{
+    font-size: 0.55rem!important;
+    margin-bottom: -5px;
+}
+
+.cardTitleMargin{
+    margin-bottom: 30px!important;
 }
