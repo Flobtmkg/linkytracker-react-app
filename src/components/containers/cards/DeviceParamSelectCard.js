@@ -21,7 +21,8 @@ export function DeviceParamSelectCard({serverBaseURL, setDeviceId}) {
     // When SSE data is recieved...
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      if(!cachedDevices.has(data.value)){
+      // Ignore magic device ID 0
+      if("0" !== data.value && !cachedDevices.has(data.value)){
         cachedDevices.set(data.value, data)
         setdeviceOptions(Array.from(cachedDevices.values()));
       }

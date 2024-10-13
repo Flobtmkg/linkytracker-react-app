@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {getVersionEnv} from "../../../utilities/EnvUtil";
 import './Card.css'
 import Slider from '@mui/material/Slider';
 import { styled } from '@mui/material/styles';
@@ -19,6 +20,7 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
   const [offsetDataFilter, setoffsetDataFilter] = useState(0);
   const [defaultOffsetTimeZone, setDefaultOffsetTimeZone] = useState(0);
   const [controlsLocked, setControlsLocked] = useState(true);
+  const [serverAppVersion, setServerAppVersion] = useState("");
 
   function getScale(value) {
     return Math.round(Math.exp(Math.pow(value,1/goldScaleRatio)));
@@ -79,7 +81,6 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
   const fetchRecentActivity = () => {
     fetch(serverBaseURL + deviceRecentActivityApi + "?" + "deviceId=" + deviceId)
       .then(response => {return response.text()})
-      .then(data => data !== "false" && data !== "true" ? "" : data)
       .then(data => {setRecentActivite(data)})
       .catch(error => console.error('Error fetching data from device recent activity Api :', error));
   }
@@ -88,6 +89,7 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
     fetch(serverBaseURL + serverConfigApi)
       .then(response => {return response.json()})
       .then(data => {
+        setServerAppVersion(data.backendVersion)
         setoffsetDataFilter(data.dataFilter);
         setDefaultWindowSize(data.defaultTimeWindow)
         setWindowSizeValue(data.defaultTimeWindow)
@@ -130,6 +132,22 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
     setDefaultWindowSize(value);
   }
 
+
+  function isToday(strActivity){
+    if(strActivity !== ""){
+      const dateActivity = new Date(strActivity);
+      const today = new Date();
+      if(dateActivity.getFullYear() == today.getFullYear()
+        && dateActivity.getMonth() == today.getMonth()
+        && dateActivity.getDate() == today.getDate()) {
+
+          return true;
+      }
+    }
+    return false;
+  }
+
+
   // Only run once
   useEffect(() => {
     fetchRecentActivity(),
@@ -142,17 +160,19 @@ export function MainInfoCard({serverBaseURL, deviceId, targetDate, setWindowSize
         <h5 className="card-title text-center cardTitleMargin">Summary</h5>
         <p className="card-text summaryContentText"><b>Selected date : </b><small><i>{(targetDate != null && targetDate != "") ? targetDate : "---"}</i></small></p>
         <p className="card-text summaryContentText"><b>Selected device : </b><small><i>{(deviceId != null && deviceId != "") ? deviceId : "---"}</i></small></p>
-        <p className="card-text summaryContentText"><b>Device active : </b>
+        <p className="card-text summaryContentText"><b>Device activity : </b>
           <small>
-            <i className={recentActivite === "false" ? "warning-text" : recentActivite != "" ? "ok-text" : ""}>
-              {(recentActivite != "") ? recentActivite : "---"}
+            <i className={!isToday(recentActivite) ? recentActivite != "" ? "warning-text" : "" : "ok-text"}>
+              {(recentActivite != "") ? isToday(recentActivite) ? "Active" : "Inactive -> last data " + recentActivite : "---"}
             </i>
           </small>
         </p>
+        <p className="card-text summaryContentText"><b>User interface application version : </b><small><i>{getVersionEnv()}</i></small></p>
+        <p className="card-text summaryContentText"><b>Server application version : </b><small><i>{serverAppVersion}</i></small></p>
       </div>
       <div className="card cardBox text-bg-dark">
-      <p className="alignedTextRight additionalLabel">* advanced parameters relative to UI requires a page reload</p>
-        <FormControlLabel disableTypography={true} className="serverControls cardTitleMargin" control={<Checkbox icon={<LockOpenOutlinedIcon color="success" />} checkedIcon={<LockIcon color="warning" />} onChange={(event, checked) => setControlsLocked(checked)} checked={controlsLocked} />} label="Advanced parameters *" />
+      <p className="alignedTextRight additionalLabel">* default parameters relative to UI requires a page reload</p>
+        <FormControlLabel disableTypography={true} className="serverControls cardTitleMargin" control={<Checkbox icon={<LockOpenOutlinedIcon color="success" />} checkedIcon={<LockIcon color="warning" />} onChange={(event, checked) => setControlsLocked(checked)} checked={controlsLocked} />} label="Default parameters *" />
         <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Device input offset filter (ms) : </b></p><IOSSlider onChangeCommitted={(event, value) => postOffsetFilterValueConfig(value)}  min={5} max={300} defaultValue={offsetDataFilter} valueLabelDisplay="on" disabled={controlsLocked} /></div>
         <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Default startup window size (min) : </b></p><IOSSlider scale={getScale} onChangeCommitted={(event, value) => postDefaultTimeWindowSizeValueConfig(getScale(value))}  min={1} max={1439} defaultValue={getInverseScale(defaultWindowSize)} valueLabelDisplay="on" disabled={controlsLocked} /></div>
         <div className="flexContainer sliderwrapper"><p className="card-text summaryContentText hackTextAndSlider"><b>Data time zone offset (hour) : </b></p><IOSSlider  min={-12} max={12} defaultValue={defaultOffsetTimeZone} onChangeCommitted={(event, value) => postDefaultOffsetTimeZoneConfig(value)} valueLabelDisplay="on" disabled={controlsLocked} /></div>

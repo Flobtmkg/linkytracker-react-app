@@ -1,12 +1,14 @@
 {
   "name": "linkytracker",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "main": "./src/Entrypoint.js",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "web-dev-linux": "NODE_ENV=development npx expo start --web",
+    "web-dev-windows": "set NODE_ENV=development&&npx expo start --web"
   },
   "dependencies": {
     "@emotion/react": "~11.13.0",

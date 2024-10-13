@@ -1,36 +1,51 @@
+const ENV = process.env.NODE_ENV;
+const VERSION = process.env.APP_MANIFEST.version
+
+const ENV_DEV="development";
+
+const DEV_SERVER_HOST="localhost";
+const DEV_SERVER_PROTOCOLE="http";
+const DEV_SERVER_PORT="8080";
+
+var isInfoPrinted = false;
+
+
+export function getVersionEnv(){
+    return VERSION;
+}
+
+
 export function getHostEnv(){
-    if(typeof LINKY_SERVER_HOST !== 'undefined'){
-        var host=LINKY_SERVER_HOST;
-        if(host!=null && host!=""){
-            return host;
-        }
+    if(ENV == ENV_DEV){
+       return DEV_SERVER_HOST;
     }
-    return "localhost";
+    return window.location.hostname;
 }
 
 
 export function getProtocoleEnv(){
-    if(typeof LINKY_SERVER_PROTOCOLE !== 'undefined'){
-        var protocole=LINKY_SERVER_PROTOCOLE;
-        if(protocole==="https"){
-            return "https";
-        }
+    if(ENV == ENV_DEV){
+        return DEV_SERVER_PROTOCOLE;
     }
-    return "http";
+    return window.location.protocol.slice(0,-1);
 }
 
 export function getPortEnv(){
-    if(typeof LINKY_SERVER_PORT !== 'undefined'){
-        var port=LINKY_SERVER_PORT;
-        if(port!=null && port!=""){
-            return Number.parseInt(port).toString() !== "NaN" ? Number.parseInt(port).toString() : "8080";
-        }
+    if(ENV == ENV_DEV){
+        return DEV_SERVER_PORT;
     }
-    return "8080";
+    return window.location.port;
 }
 
 export function getBackendAddress(){
-    var address = getProtocoleEnv() + "://" + getHostEnv() + ":" + getPortEnv();
-    console.log("backend address resolved at : " + address);
+    var address = getProtocoleEnv() + "://" + getHostEnv();
+    if(getPortEnv() !== ""){
+        address = address + ":" + getPortEnv();
+    }
+    if(!isInfoPrinted){
+        console.log("frontend version : " + VERSION);
+        console.log("backend address resolved at : " + address);
+        isInfoPrinted=true;
+    }
     return address;
 }

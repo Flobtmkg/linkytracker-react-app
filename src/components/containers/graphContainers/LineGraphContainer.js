@@ -75,16 +75,20 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
     useEffect(() => {
         const path = serverBaseURL + api;
         let params = "?";
-        if(deviceId != null && deviceId != ""){
+        if(deviceId != null
+            && deviceId != ""
+            && targetDate != null
+            && targetDate != ""){
+
             params = params + "deviceId=" + deviceId + "&"
-        }
-        if(targetDate != null && targetDate != ""){
             params = params + "date=" + targetDate
+
+            eventSource.close();
+            emptyCacheData();
+            populateGraph();
+            eventSourceConfig(path + params);
+
         }
-        eventSource.close();
-        emptyCacheData();
-        populateGraph();
-        eventSourceConfig(path + params);
     }, [serverBaseURL, api, deviceId, targetDate, offsetTimeZone]);
 
     useEffect(() => {
@@ -185,22 +189,24 @@ export function LineGraphContainer({ serverBaseURL, api, deviceId, targetDate, w
 
     // Change the DataGraph state with dataGraphMapCache values
     function populateGraph(){
-        // Storing last value
-        const cachedlastTime = Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).x;
-        lastValue = {
-            wattage : nbrFormat.format((Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).y).toFixed(2)),
-            time : cachedlastTime == ("" || null || undefined) ? " -" : dateUtil.millisTimestampToFormatedDateTransform(cachedlastTime)
-        };
+        if(dataGraphMapCache.size > 0) {
+            // Storing last value
+            const cachedlastTime = Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).x;
+            lastValue = {
+                wattage : nbrFormat.format((Array.from(dataGraphMapCache.values()).at(dataGraphMapCache.size - 1).y).toFixed(2)),
+                time : cachedlastTime == ("" || null || undefined) ? " -" : dateUtil.millisTimestampToFormatedDateTransform(cachedlastTime)
+            };
 
-        // create expected object for the ResponsiveLine graph
-        const tmpSerieObjectGraph = {
-            id : "device : " + deviceId,
-            data : filterDataToDisplay(),
-            color : "hsl(208, 70%, 50%)"
+            // create expected object for the ResponsiveLine graph
+            const tmpSerieObjectGraph = {
+                id : "device : " + deviceId,
+                data : filterDataToDisplay(),
+                color : "hsl(208, 70%, 50%)"
+            }
+
+            // Applying tmpSerieObjectGraph as an array with one value because we only manage one curve by now
+            setDataGraph([tmpSerieObjectGraph]);
         }
-
-        // Applying tmpSerieObjectGraph as an array with one value because we only manage one curve by now
-        setDataGraph([tmpSerieObjectGraph]);
     }
 
 
